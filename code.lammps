@@ -1,0 +1,92 @@
+processors    * * *
+
+# global model settings
+units          real
+boundary	     p p p 
+atom_style     full
+bond_style	   harmonic
+angle_style    harmonic
+
+# cuttof de 13
+pair_style      lj/cut/coul/long 13 13
+
+
+# lj parameters
+variable	Ctype	  equal 1
+
+
+
+# box
+read_data	in.lmp
+kspace_style	pppm 1.0e-5 
+
+
+
+#param skoulidas
+pair_coeff   ${Ctype}    ${Ctype}      0.190865731      3.107819135   # oxygen - oxygen   epsilon sigma
+
+group 	     carbon  type  ${Ctype}  
+
+
+
+timestep        1         # integrate equations of motion every 1 fs
+
+
+# COMPUTE --------------------------------------------------------------------
+compute      zTemp    zeolite  temp   # calculate zeolite temperature
+
+
+
+# fluid thermostat -----------------------------------------------------------------
+#fix           fixzeo   zeolite nvt temp 300 300 100   #apply a Nose Hoover thermostat from 300K to 300 K in 100 timestep
+
+#fix             myzeovelo zeolite momentum 100 linear 1 1 1
+#fix             myzeoframe zeolite recenter INIT INIT INIT shift all
+
+
+
+# thermo + run ----------------------------------------------------------------
+thermo_style   custom      step c_zTemp press pe ke etotal    # timestep zeolite_temperature pressure potential_energy kinetic_energy total_energy
+thermo         100
+
+
+dump           dmp carbon custom 10 dump.lammps   id type x y z vx vy vz    # print the informations of the zeolites every 10 timestep  : id_of_each_atom id_of_its_type xpos ypos zpos xvelo yvelo zvelo
+
+
+run             10000   # run the code 10000 timestep = 10000 fs
+
+write_data      end.lmp   #final configuration 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
